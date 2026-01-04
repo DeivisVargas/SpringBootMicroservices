@@ -2,6 +2,7 @@ package br.com.microservice.pedidos.api.controller;
 
 
 import br.com.microservice.pedidos.api.entity.Pedido;
+import br.com.microservice.pedidos.api.service.PedidoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -22,8 +23,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class PedidoController {
 
 
+    private final PedidoService pedidoService ;
     //criando log da classe
     private final Logger logger = LoggerFactory.getLogger(PedidoController.class);
+
+    public PedidoController(PedidoService pedidoService) {
+        this.pedidoService = pedidoService;
+    }
 
     @Operation(summary = "Cria um novo pedido" , description = "Contém as operações para criar um novo pedido",
                         responses = @ApiResponse(responseCode =  "201" , description = "Recurso criado com sucesso",
@@ -33,6 +39,8 @@ public class PedidoController {
     public ResponseEntity<Pedido> criarPedido(@RequestBody Pedido pedido){
 
         logger.info("Pedido recebido: {}" , pedido.toString());
+        pedido = pedidoService.enfileirarPedido(pedido);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(pedido);
 
     }

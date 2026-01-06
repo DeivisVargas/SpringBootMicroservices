@@ -14,6 +14,15 @@ services:
       - rabbitmq_data:/var/lib/rabbitmq   # Corrigido aqui
       - rabbitmq_log:/var/lib/rabbitmq    # Corrigido aqui
 
+  mailhhog:
+    image: mailhog/mailhog:latest
+    container_name: mailhog
+    ports:
+      - '1020:1025'
+      - '8025:8025'
+
+
+
 volumes:
   rabbitmq_data:  # Corrigido aqui
   rabbitmq_log:   # Corrigido aqui

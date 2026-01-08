@@ -14,15 +14,25 @@ services:
       - rabbitmq_data:/var/lib/rabbitmq   # Corrigido aqui
       - rabbitmq_log:/var/lib/rabbitmq    # Corrigido aqui
 
-  mailhhog:
+  mailhog:
     image: mailhog/mailhog:latest
     container_name: mailhog
     ports:
-      - '1020:1025'
+      - '1025:1025'
       - '8025:8025'
-
-
+  postgres:
+    image: postgres:15.7
+    restart: unless-stopped
+    container_name: postgresql-15.7
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
 volumes:
+  postgres_data:
   rabbitmq_data:  # Corrigido aqui
   rabbitmq_log:   # Corrigido aqui

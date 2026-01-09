@@ -23,7 +23,7 @@ public class Pedido {
 
     private String cliente ;
 
-    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL , fetch = FetchType.LAZY, orphanRemoval = true)
     private List<ItemPedido> itens = new ArrayList<>();
 
     @Column(name = "valor_total")

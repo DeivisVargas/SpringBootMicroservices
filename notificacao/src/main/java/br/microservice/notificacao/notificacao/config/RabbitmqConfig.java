@@ -14,14 +14,24 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Configuration
 public class RabbitmqConfig {
 
     @Value("${rabbitmq.exanche.name}")
     private String exchangeName ;
 
+    @Value("${rabbitmq.exanche.dlxname}")
+    private String exchangeDlxName ;
+
+
     @Value("${rabbitmq.queue.name}")
     private String queueName ;
+
+    @Value("${rabbitmq.queue.dlqname}")
+    private String queueDlqName ;
 
     //CRIA A EXCHANGE PARA TESTES
     @Bean
@@ -29,10 +39,21 @@ public class RabbitmqConfig {
         return new FanoutExchange(exchangeName);
     }
 
-    //para retornar dados da fila
+    //cria a exchange para DLX
+    @Bean
+    public FanoutExchange pedidoDlxExchange(){
+        return new FanoutExchange(exchangeDlxName);
+    }
+
+
+    //CRIA A FILA DE NOTIFICAÇÃO
     @Bean
     public Queue NotificationQueue (){
-        return new Queue(queueName);
+        //configurado apos dar todas as tentativas e dar erro , para a mensagem ser encaminhada para a fola DLX
+        Map<String , Object> argumentos = new HashMap<>();
+        argumentos.put("x-dead-letter-exchange" , exchangeDlxName) ;
+
+        return new Queue(queueName, true, false ,false, argumentos);
     }
 
     //faz o bind da Queue com a exchange
@@ -40,6 +61,19 @@ public class RabbitmqConfig {
     public Binding binding(){
         return BindingBuilder.bind(NotificationQueue()).to(pedidoExchange()) ;
     }
+
+    //CRIA A FILA DE DLX
+    @Bean
+    public Queue NotificationdLXQueue (){
+        return new Queue(queueDlqName);
+    }
+
+    //FAZ O BIND COM DA FILA COM A EXCHANGE DLX
+    @Bean
+    public Binding bindingDlq(){
+        return BindingBuilder.bind(NotificationdLXQueue()).to(pedidoDlxExchange()) ;
+    }
+
 
 
     //CRIA A CONEXAO COM RABBITM
